@@ -1,0 +1,23 @@
+{
+  "name": "comp392lesson04-part2",
+  "version": "1.0.0",
+  "description": "A project to transpile TypeScript to JavaScript with gulp workflows",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/CentennialCollege/COMP392-Lesson04-Part2.git"
+  },
+  "author": "Tom Tsiliopoulos",
+  "license": "ISC",
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "gulp-bower": "0.0.13",
+    "gulp-connect": "^2.3.1",
+    "gulp-debug": "^2.1.2",
+    "gulp-inject": "^3.0.0",
+    "gulp-open": "^1.0.0",
+    "gulp-rimraf": "^0.2.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-typescript": "^2.10.0",
+    "gulp-util": "^3.0.7"
+  }
+}
