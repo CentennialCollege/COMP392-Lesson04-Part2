@@ -19,6 +19,7 @@ import AxisHelper = THREE.AxisHelper;
 import CameraHelper = THREE.CameraHelper;
 import LambertMaterial = THREE.MeshLambertMaterial;
 import MeshBasicMaterial = THREE.MeshBasicMaterial;
+import MeshDepthMaterial = THREE.MeshDepthMaterial;
 import Material = THREE.Material;
 import Texture = THREE.Texture;
 import RepeatWrapping = THREE.RepeatWrapping;
@@ -46,7 +47,7 @@ var scene: Scene;
 var renderer: Renderer;
 var webGLRenderer: WebGLRenderer;
 var canvasRenderer: CanvasRenderer;
-var camera: Camera;
+var camera: PerspectiveCamera;
 var axes: AxisHelper;
 var directionalLightHelper: CameraHelper;
 var cube: Mesh;
@@ -80,11 +81,12 @@ var groundGeometry: PlaneGeometry;
 var groundMaterial: MeshBasicMaterial;
 var groundMesh: Mesh;
 var meshMaterial: MeshBasicMaterial;
+var overrideMaterial: MeshDepthMaterial;
 
 function init() {
     // Instantiate a new Scene object
     scene = new Scene();
-    scene.fog = new Fog(0xaaaaaa, 0.010, 200);
+    scene.overrideMaterial = new MeshDepthMaterial();
 
     setupRenderer(); // setup the default renderer
 	
@@ -140,10 +142,7 @@ function init() {
     
     // add controls
     gui = new GUI();
-    control = new Control(0.02, 0.03, meshMaterial.opacity, meshMaterial.transparent, 
-    meshMaterial.overdraw, meshMaterial.visible, "front", meshMaterial.color.getStyle(),
-    meshMaterial.wireframe, meshMaterial.wireframeLinewidth, meshMaterial.wireframeLinejoin,
-    "cube");
+    control = new Control(camera.near, camera.far, 0.02, scene.children.length);
     addControl(control);
 
     // Add framerate stats
@@ -166,84 +165,15 @@ function onResize(): void {
 }
 
 function addControl(controlObject: Control): void {
-    var spGui = gui.addFolder("Mesh");
-    spGui.add(controlObject, 'opacity', 0, 1).onChange((opacity) => {
-        meshMaterial.opacity = opacity;
+    gui.add(controlObject, 'rotationSpeed', 0, 0.5);
+    gui.add(controlObject, 'addCube');
+    gui.add(controlObject, 'removeCube');
+    gui.add(controlObject, 'cameraNear', 0, 50).onChange(function(near) {
+        camera.near = near;
+    })
+    gui.add(controlObject, 'cameraFar', 50, 200).onChange(function(far) {
+        camera.far = far;
     });
-
-    spGui.add(controlObject, 'transparent').onChange((transparent) => {
-        meshMaterial.transparent = transparent;
-    });
-
-    spGui.add(controlObject, 'wireframe').onChange((wireframe) => {
-        meshMaterial.wireframe = wireframe;
-    });
-
-    spGui.add(controlObject, 'wireframeLinewidth', 0, 20).onChange((width) => {
-        meshMaterial.wireframeLinewidth = width
-    });
-
-    spGui.add(controlObject, 'visible').onChange((visible) => {
-        meshMaterial.visible = visible;
-    });
-
-    spGui.add(controlObject, 'side', ["front", "back", "double"]).onChange((side) => {
-        console.log(side);
-        switch (side) {
-            case "front":
-                meshMaterial.side = THREE.FrontSide;
-                break;
-            case "back":
-                meshMaterial.side = THREE.BackSide;
-                break;
-            case "double":
-                meshMaterial.side = THREE.DoubleSide
-                break;
-        }
-        meshMaterial.needsUpdate = true;
-        console.log(meshMaterial);
-    });
-
-    spGui.addColor(controlObject, 'colour').onChange((color) => {
-        meshMaterial.color.setStyle(color)
-    });
-
-    spGui.add(controlObject, 'selectedMesh', ["cube", "sphere", "plane"]).onChange((shape) => {
-
-        scene.remove(plane);
-        scene.remove(cube);
-        scene.remove(sphere);
-        console.log("remove plane, cube, and sphere");
-
-        switch (shape) {
-            case "cube":
-                scene.add(cube);
-                console.log("added cube");
-                break;
-            case "sphere":
-                scene.add(sphere);
-                console.log("added sphere");
-                break;
-            case "plane":
-                scene.add(plane);
-                console.log("added plane");
-                break;
-        }
-        //scene.add(shape);
-    });
-
-    //gui.add(controlObject, 'switchRenderer');
-
-    var cvGui = gui.addFolder("Canvas renderer");
-
-    cvGui.add(controlObject, 'overdraw').onChange((overdraw) => {
-        meshMaterial.overdraw = overdraw;
-    });
-
-    cvGui.add(controlObject, 'wireFrameLineJoin', ['round', 'bevel', 'miter']).onChange((lineJoin) => {
-        meshMaterial.wireframeLinejoin = lineJoin;
-    });
-
 }
 
 // Add Stats Object to the Scene
@@ -260,10 +190,14 @@ function addStatsObject() {
 function gameLoop(): void {
     stats.update();
 
-    //rotate the shapes
-    cube.rotation.y = step += 0.01;
-    plane.rotation.y = step;
-    sphere.rotation.y = step;
+    // rotate the cubes around its axes
+    scene.traverse(function(shape) {
+        if (shape instanceof THREE.Mesh) {
+            shape.rotation.x += control.rotationSpeed;
+            shape.rotation.y += control.rotationSpeed;
+            shape.rotation.z += control.rotationSpeed;
+        }
+    });
     
     // render using requestAnimationFrame
     requestAnimationFrame(gameLoop);
@@ -285,17 +219,19 @@ function setupRenderer(): void {
     /*
     canvasRenderer = new CanvasRenderer();
     canvasRenderer.setSize(window.innerWidth, window.innerHeight);
-    */
-    renderer = webGLRenderer;
     console.log("Finished setting up CanvasRenderer...");
+    */
+
+    renderer = webGLRenderer;
+
 }
 
 // Setup main camera for the scene
 function setupCamera(): void {
-    camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.x = -20;
-    camera.position.y = 50;
-    camera.position.z = 40;
-    camera.lookAt(new Vector3(10, 0, 0));
+    camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 130);
+    camera.position.x = -50;
+    camera.position.y = 40;
+    camera.position.z = 50;
+    camera.lookAt(scene.position);
     console.log("Finished setting up Initial Camera...");
 }

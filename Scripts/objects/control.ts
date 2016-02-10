@@ -4,50 +4,43 @@ module objects {
     // CONTROL CLASS ++++++++++++++++++++++++++++++++++++++++++
     export class Control { 
         //PUBLIC INSTANCE VARIABLES +++++++++++++++++++++++++++
-        public rotationSpeed: number;
-        public bouncingSpeed: number;
-        public opacity: number;
-        public transparent: boolean;
-        public overdraw: number;
-        public visible: boolean;
-        public side: string;
-        public colour: string;
-        public wireframe: boolean;
-        public wireframeLinewidth: number;
-        public wireFrameLineJoin: string;
-        public selectedMesh: string;
+       
         // CONSTRUCTOR ++++++++++++++++++++++++++++++++++++++++
-        constructor(rotationSpeed: number, bouncingSpeed: number,
-            opacity: number, transparent: boolean, overdraw: number,
-            visible: boolean, side: string, colour: string, wireframe: boolean,
-            wireframeLineWidth: number, wireframeLineJoin: string,
-            selectedMesh: string) {
-            this.rotationSpeed = rotationSpeed;
-            this.bouncingSpeed = bouncingSpeed;
-            this.opacity = opacity;
-            this.transparent = transparent;
-            this.overdraw = overdraw;
-            this.visible = visible;
-            this.side = side;
-            this.colour = colour;
-            this.wireframe = wireframe;
-            this.wireframeLinewidth = wireframeLineWidth;
-            this.wireFrameLineJoin = wireframeLineJoin;
-            this.selectedMesh = selectedMesh;
+        constructor(public cameraNear: number,
+            public cameraFar: number,
+            public rotationSpeed: number,
+            public numberOfObjects: number) {
         }
-        
-       /*
-        public switchRenderer():void {
-            if(renderer instanceof WebGLRenderer) {
-                renderer = canvasRenderer;
-                document.body.removeChild(document.body.lastChild);
-                document.body.appendChild(renderer.domElement);
-            } else {
-                renderer = webGLRenderer;
-                document.body.removeChild(document.body.lastChild);
-                document.body.appendChild(renderer.domElement);
+
+        public removeCube(): void {
+            var allChildren: Object3D[] = scene.children;
+            var lastObject: Object3D = allChildren[allChildren.length - 1];
+            if (lastObject instanceof Mesh) {
+                scene.remove(lastObject);
+                this.numberOfObjects = scene.children.length;
             }
         }
-        */
+
+        public addCube(): void {
+            var cubeSize: number = Math.ceil(3 + (Math.random() * 3));
+            var cubeGeometry: CubeGeometry = new CubeGeometry(cubeSize, cubeSize, cubeSize);
+            var cubeMaterial: LambertMaterial = new LambertMaterial({ color: Math.random() * 0xffffff });
+            var cube: Mesh = new Mesh(cubeGeometry, cubeMaterial);
+            cube.castShadow = true;
+
+            // position the cube randomly in the scene
+            cube.position.x = -60 + Math.round((Math.random() * 100));
+            cube.position.y = Math.round((Math.random() * 10));
+            cube.position.z = -100 + Math.round((Math.random() * 150));
+
+            // add the cube to the scene
+            scene.add(cube);
+            this.numberOfObjects = scene.children.length;
+        }
+
+        public outputObjects(): void {
+            console.log(scene.children);
+        }
+
     }
 }
