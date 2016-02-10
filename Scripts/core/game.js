@@ -251,4 +251,5 @@ function setupCamera() {
     camera.lookAt(new Vector3(10, 0, 0));
     console.log("Finished setting up Initial Camera...");
 }
+
 //# sourceMappingURL=game.js.map
