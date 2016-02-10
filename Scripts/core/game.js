@@ -83,45 +83,6 @@ function init() {
     scene.overrideMaterial = new MeshDepthMaterial();
     setupRenderer(); // setup the default renderer
     setupCamera(); // setup the camera
-    // add an axis helper to the scene
-    axes = new AxisHelper(20);
-    scene.add(axes);
-    console.log("Added Axis Helper to scene...");
-    //Add a Plane to the Scene
-    groundGeometry = new PlaneGeometry(1000, 100, 4, 4);
-    groundMaterial = new MeshBasicMaterial({ color: 0x777777 });
-    groundMesh = new Mesh(groundGeometry, groundMaterial);
-    groundMesh.rotation.x = -Math.PI * 0.5;
-    groundMesh.position.y = -20;
-    scene.add(groundMesh);
-    console.log("Added Ground Mesh to scene...");
-    // Setup Shape Geometries
-    sphereGeometry = new SphereGeometry(14, 20, 20);
-    cubeGeometry = new CubeGeometry(15, 15, 15);
-    planeGeometry = new PlaneGeometry(14, 14, 4, 4);
-    // Setup Shared MeshBasic Material
-    meshMaterial = new MeshBasicMaterial({ color: 0x7777ff });
-    // Instantiate Meshes
-    sphere = new Mesh(sphereGeometry, meshMaterial);
-    cube = new Mesh(cubeGeometry, meshMaterial);
-    plane = new Mesh(planeGeometry, meshMaterial);
-    // Set Mesh positions
-    sphere.position.set(0, 3, 2);
-    cube.position.set(0, 3, 2);
-    plane.position.set(0, 3, 2);
-    // Add Cube Mesh to the scene
-    scene.add(cube);
-    console.log("Added Cube Mesh to the Scene");
-    // Add subtle ambient lighting
-    ambientLight = new AmbientLight(0x0c0c0c);
-    scene.add(ambientLight);
-    console.log("Added Ambient Light to the Scene");
-    // Add spotLight for the shadows
-    spotLight = new SpotLight(0xffffff);
-    spotLight.position.set(-40, 60, -10);
-    spotLight.castShadow = true;
-    scene.add(spotLight);
-    console.log("Added Spot Light to the Scene");
     // add controls
     gui = new GUI();
     control = new Control(camera.near, camera.far, 0.02, scene.children.length);
@@ -181,7 +142,7 @@ function gameLoop() {
 function setupRenderer() {
     // setup WebGLRenderer
     webGLRenderer = new WebGLRenderer();
-    webGLRenderer.setClearColor(0xEEEEEE, 1.0);
+    webGLRenderer.setClearColor(0x000000, 1.0);
     webGLRenderer.setSize(window.innerWidth, window.innerHeight);
     webGLRenderer.shadowMap.enabled = true;
     console.log("Finished setting up WebGLRenderer...");
@@ -202,4 +163,5 @@ function setupCamera() {
     camera.lookAt(scene.position);
     console.log("Finished setting up Initial Camera...");
 }
+
 //# sourceMappingURL=game.js.map
